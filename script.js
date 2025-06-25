@@ -9,26 +9,35 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: ["Bill rate(Monthly)", "ECTC(Annually)"],
             calculate: function(billRate, ectc) {
                 const margin = (billRate - (billRate * 0.05)) - (ectc / 12);
-                return `<p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
+		const marginColor = margin >= 35000 ? 'green' : 'red';
+                return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         },
 	"HCL": {
     labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
+	defaultValues: [null, 18, null],
     calculate: function(ectc, markup, clientBillRate) {
         const billRate = (ectc + (ectc * markup) / 100) / 12;
         const monthlyMargin = billRate - (ectc / 12);
         const annualMargin = monthlyMargin * 12;
+	const bufferAmount = clientBillRate - billRate
 
-        let comparisonMessage = "";
-        if (clientBillRate && billRate > clientBillRate) {
+let bufferMessage = '';        
+let comparisonMessage = "";
+const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
+  if (clientBillRate && clientBillRate > billRate) {
+    const bufferAmount = clientBillRate - billRate;
+    bufferMessage = `<p style="color:green;"><strong>Buffer Amount (Monthly):</strong> ₹${bufferAmount.toFixed(2)}</p>`;
+  }else if (clientBillRate && billRate > clientBillRate) {
             const exceededAmount = billRate - clientBillRate;
             comparisonMessage = `<p style="color:red;"><strong>Warning:</strong> You are exceeding the Bill Rate from client by ₹${exceededAmount.toFixed(2)}</p>`;
         }
 
         return `
             <p><strong>Billrate (Monthly):</strong> ₹${billRate.toFixed(2)}</p>
-            <p><strong>Monthly Margin:</strong> ₹${monthlyMargin.toFixed(2)}</p>
+            <p><strong>Monthly Margin:</strong> <span style="color:${monthlyMarginColor};">₹${monthlyMargin.toFixed(2)}</span></p>
             <p><strong>Annual Margin:</strong> ₹${annualMargin.toFixed(2)}</p>
+	    ${bufferMessage}
             ${comparisonMessage}
         `;
     }
@@ -39,16 +48,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const candidateOffer = (billRate / 1.25) * 227;
 		const hourlyrate = billRate / 1.25;
                 const margin = (billRate - (billRate / 1.25)) * 18.91667;
+		const marginColor = margin >= 35000 ? 'green' : 'red';
+
                 return `<p><strong>Candidate can be offered:</strong> ${candidateOffer.toFixed(2)}</p>
 			<p><strong>Candidate daily rate:</strong> ${hourlyrate.toFixed(2)}</p>
-                        <p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
+                        <p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         },
 	"Lowes": {
 	    labels: ["Bill rate(Hourly)", "MSP %", "ECTC(Annually)"],
+	defaultValues: [null, 3, null],
 	calculate: function(billRate, msp, ectc) {
 	const margin = ((billRate * 160) * (1 - (msp / 100))) - (ectc / 12);
-	return `<p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
+	const marginColor = margin >= 35000 ? 'green' : 'red';
+	return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
 }
 },
 
@@ -56,7 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: ["Bill rate(Hourly)", "ECTC(Annually)"],
             calculate: function(billRate, ectc) {
                 const margin = ((billRate*160*12) - (ectc ))/ 12;
-                return `<p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
+		const marginColor = margin >= 35000 ? 'green' : 'red';
+                return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         }
     };
@@ -147,6 +161,10 @@ function performCalculation() {
                 inputGroup.appendChild(labelElement);
                 inputGroup.appendChild(inputElement);
                 inputFieldsSection.appendChild(inputGroup);
+
+		if (data.defaultValues && data.defaultValues[index] !== null) {
+  inputElement.value = data.defaultValues[index];
+}
 		
 		const unitSpan = document.createElement('span');
             unitSpan.style.marginLeft = '10px';
