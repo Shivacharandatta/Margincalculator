@@ -60,39 +60,65 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     };
+function convertECTC(value) {
+    value = parseFloat(value);
+    if (isNaN(value)) return 0;
 
-    function performCalculation() {
-        const selectedClient = clientDropdown.value;
-        if (clientData[selectedClient]) {
-            const data = clientData[selectedClient];
-            const inputs = inputFieldsSection.querySelectorAll('input[type="number"]');
-            const values = Array.from(inputs).map(input => parseFloat(input.value));
+    if (value <= 100) return value * 100000;          // Assume LPA
+    if (value <= 3500) return value * 160 * 12;       // Hourly
+if ( value > 3500 && value < 20000) return value * 20 *12;			// Per day
+    return value * 12;                           // Monthly
+}
 
-            if (values.some(isNaN)) {
-                resultOutput.innerHTML = '<p class="error">Please enter valid numbers.</p>';
-                resultsSection.classList.remove('hidden');
-                return;
+function getECTCUnit(value) {
+    value = parseFloat(value);
+    if (isNaN(value)) return '';
+    if (value <= 100) return 'LPA';
+    if (value <= 3500) return 'Hourly';
+if (value > 3500 && value < 20000) return 'Per day';
+    return 'Monthly';
+}
+function performCalculation() {
+    const selectedClient = clientDropdown.value;
+    if (clientData[selectedClient]) {
+        const data = clientData[selectedClient];
+        const inputs = inputFieldsSection.querySelectorAll('input[type="number"]');
+        let values = [];
+
+        inputs.forEach(input => {
+            let val = parseFloat(input.value);
+            if (input.dataset.ectc === 'true') {
+                val = convertECTC(val); // convert ECTC for backend use
             }
+            values.push(val);
+        });
 
-            let resultHTML = '';
-            if (selectedClient === 'Sony') {
-                resultHTML = data.calculate(values[0], values[1]);
-            } else if (selectedClient === 'Diageo') {
-                resultHTML = data.calculate(values[0]);
-            } else if (selectedClient === 'Trane Technologies') {
-                resultHTML = data.calculate(values[0], values[1]);
-            } else if (selectedClient === 'HCL') {
-                resultHTML = data.calculate(values[0], values[1], values[2]);
-	    } else if (selectedClient === 'Lowes') {
-                resultHTML = data.calculate(values[0], values[1], values[2]);
-            }
-
-            resultOutput.innerHTML = resultHTML;
+        if (values.some(isNaN)) {
+            resultOutput.innerHTML = '<p class="error">Please enter valid numbers.</p>';
             resultsSection.classList.remove('hidden');
-        } else {
-            resultsSection.classList.add('hidden');
+            return;
         }
+
+        let resultHTML = '';
+        if (selectedClient === 'Sony') {
+            resultHTML = data.calculate(values[0], values[1]);
+        } else if (selectedClient === 'Diageo') {
+            resultHTML = data.calculate(values[0]);
+        } else if (selectedClient === 'Trane Technologies') {
+            resultHTML = data.calculate(values[0], values[1]);
+        } else if (selectedClient === 'HCL') {
+            resultHTML = data.calculate(values[0], values[1], values[2]);
+        }else if (selectedClient === 'Lowes') {
+                resultHTML = data.calculate(values[0], values[1], values[2]);
+            }
+
+
+        resultOutput.innerHTML = resultHTML;
+        resultsSection.classList.remove('hidden');
+    } else {
+        resultsSection.classList.add('hidden');
     }
+}
 
     clientDropdown.addEventListener('change', function() {
         const selectedClient = this.value;
@@ -101,12 +127,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (clientData[selectedClient]) {
             const data = clientData[selectedClient];
-            data.labels.forEach(label => {
+            data.labels.forEach((label,index) => {
                 const inputGroup = document.createElement('div');
                 inputGroup.classList.add('input-group');
-                const labelElement = document.createElement('label');
+                
+		const labelElement = document.createElement('label');
                 labelElement.textContent = label + ':';
-                const inputElement = document.createElement('input');
+                
+		const inputWrapper = document.createElement('div');
+            inputWrapper.style.display = 'flex';
+            inputWrapper.style.alignItems = 'center';
+			
+		const inputElement = document.createElement('input');
                 inputElement.type = 'number';
                 inputElement.step = 'any';
                 inputElement.name = label.toLowerCase().replace(/[\s()]/g, ''); // Create a simple name
@@ -115,7 +147,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 inputGroup.appendChild(labelElement);
                 inputGroup.appendChild(inputElement);
                 inputFieldsSection.appendChild(inputGroup);
-            });
+		
+		const unitSpan = document.createElement('span');
+            unitSpan.style.marginLeft = '10px';
+            unitSpan.style.fontWeight = 'bold';
+            unitSpan.textContent = '';
+
+            // Track ECTC input for dynamic unit rendering
+            if (label.toLowerCase().includes('ectc')) {
+                inputElement.dataset.ectc = 'true';
+                inputElement.addEventListener('input', function () {
+                    unitSpan.textContent = getECTCUnit(this.value);
+                    performCalculation();
+                });
+            } else {
+                inputElement.addEventListener('input', performCalculation);
+            }
+
+            inputWrapper.appendChild(inputElement);
+            inputWrapper.appendChild(unitSpan);
+            inputGroup.appendChild(labelElement);
+            inputGroup.appendChild(inputWrapper);
+            inputFieldsSection.appendChild(inputGroup);
+           });
         }
     });
 });
