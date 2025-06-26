@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         },
-        "Capgemini": {
+        "Capg": {
             labels: ["ECTC", "Experience"],
             calculate: function(ectc, experience) {
                 const dailyrate = (((ectc * 0.1 + ectc)) / 12) / 22;
