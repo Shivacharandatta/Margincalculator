@@ -117,7 +117,7 @@ function performCalculation() {
         if (selectedClient === 'Sony') {
             resultHTML = data.calculate(values[0], values[1]);
         } else if (selectedClient === 'Diageo') {
-            resultHTML = data.calculate(values[0]);
+            resultHTML = data.calculate(values[0], values[1]);
         } else if (selectedClient === 'Trane Technologies') {
             resultHTML = data.calculate(values[0], values[1]);
         } else if (selectedClient === 'HCL') {
