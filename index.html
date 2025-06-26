@@ -1,46 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Margin Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margin Calculation Station</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 700px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      background-color: #f0f6ff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .logo-container img {
+      max-height: 80px;
+      object-fit: contain;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .tagline {
+      font-style: italic;
+      color: #555;
+    }
+    #client-selection,
+    #input-fields,
+    #results {
+      margin-bottom: 20px;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input,
+    select {
+      padding: 10px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #results {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    #result-output {
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-	
-    <div class="container">
-        <header class="tsit-header">
-  <div class="logo-container">
-    <img src="https://shivacharandatta.github.io/Margincalculator/TSIT_Logo.png" 
-         alt="TSIT Digital Logo">
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        <img src="https://shivacharandatta.github.io/Margincalculator/TSIT_Logo.png" alt="TSIT Digital Logo">
+      </div>
+      <h2>Margin Calculation Station</h2>
+      <p class="tagline">Profit Starts Here: Crunch Your Margins Today!</p>
+    </header>
+
+    <section id="client-selection">
+      <label for="client-dropdown">Select Client:</label>
+      <select id="client-dropdown">
+        <option value="">-- Choose a Client --</option>
+        <option value="Sony">Sony</option>
+        <option value="HCL">HCL</option>
+        <option value="Diageo">Diageo</option>
+        <option value="Lowes">Lowes</option>
+        <option value="Capgemini">Capgemini</option>
+        <option value="Trane Technologies">Trane Technologies</option>
+      </select>
+    </section>
+
+    <section id="input-fields"></section>
+
+    <section id="results" class="hidden">
+      <h3>Calculation Results</h3>
+      <div id="result-output"></div>
+    </section>
   </div>
-  <h2>Margin Calculation Station</h2>
-  <p class="tagline">Profit Starts Here: Crunch Your Margins Today!</p>
-</header>
 
-        <section id="client-selection">
-            <label for="client-dropdown">Select Client:</label>
-            <select id="client-dropdown">
-                <option value="">-- Choose a Client --</option>
-                <option value="Sony">Sony</option>
-                <option value="Diageo">Diageo</option>
-                <option value="Trane Technologies">Trane Technologies</option>
-		<option value="HCL">HCL</option>
-		<option value="Lowes">Lowe's</option>
-		<option value="Capg">Capgemini</option>
-            </select>
-        </section>
-
-        <section id="input-fields">
-            </section>
-
-        <section id="results" class="hidden">
-            <h2>Calculation Results</h2>
-            <div id="result-output">
-                </div>
-        </section>
-    </div>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
