@@ -95,6 +95,85 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    clientDropdown.addEventListener('change', function() {
+        const selectedClient = this.value;
+        inputFieldsSection.innerHTML = '';
+        resultsSection.classList.add('hidden');
+        const data = clientData[selectedClient];
+        if (!data) return;
+
+        data.labels.forEach((label, index) => {
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('input-group');
+
+            const labelElement = document.createElement('label');
+            labelElement.textContent = label + ':';
+            inputGroup.appendChild(labelElement);
+
+            if (label === 'Experience' && selectedClient === 'Capgemini') {
+                const select = document.createElement('select');
+                select.required = true;
+                select.innerHTML = `
+                    <option value="">-- Select Experience --</option>
+                    <option value="12 +">12 +</option>
+                    <option value="10 to 12">10 to 12</option>
+                    <option value="8 to 10">8 to 10</option>
+                    <option value="6 to 8">6 to 8</option>
+                    <option value="4 to 6">4 to 6</option>`;
+                select.addEventListener('change', performCalculation);
+                inputGroup.appendChild(select);
+                inputFieldsSection.appendChild(inputGroup);
+                return;
+            }
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = 'any';
+            input.min = '0';
+            input.required = true;
+            input.pattern = '[0-9]*';
+            input.inputMode = 'decimal';
+
+            input.addEventListener('keydown', function (e) {
+                if (["e", "E", "+", "-"].includes(e.key) || (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")) {
+                    e.preventDefault();
+                }
+            });
+
+            input.addEventListener('input', function () {
+                if (parseFloat(input.value) < 0) input.value = '';
+                performCalculation();
+            });
+
+            if (data.defaultValues && data.defaultValues[index] !== null) {
+                input.value = data.defaultValues[index];
+            }
+
+            const inputWrapper = document.createElement('div');
+            inputWrapper.style.display = 'flex';
+            inputWrapper.style.alignItems = 'center';
+
+            const unitSpan = document.createElement('span');
+            unitSpan.style.marginLeft = '10px';
+            unitSpan.style.fontWeight = 'bold';
+
+            if (label.toLowerCase().includes('ectc')) {
+                input.dataset.ectc = 'true';
+                input.addEventListener('input', function () {
+                    unitSpan.textContent = getECTCUnit(this.value);
+                    performCalculation();
+                });
+            } else {
+                input.addEventListener('input', performCalculation);
+            }
+
+            inputWrapper.appendChild(input);
+            inputWrapper.appendChild(unitSpan);
+            inputGroup.appendChild(inputWrapper);
+            inputFieldsSection.appendChild(inputGroup);
+        });
+    });
+
     function convertECTC(value) {
         value = parseFloat(value);
         if (isNaN(value)) return 0;
@@ -115,104 +194,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function performCalculation() {
         const selectedClient = clientDropdown.value;
-        if (clientData[selectedClient]) {
-            const inputs = inputFieldsSection.querySelectorAll('input, select');
-            let values = [];
-            inputs.forEach(input => {
-                if (input.tagName.toLowerCase() === 'select') {
-                    values.push(input.value);
-                } else {
-                    let val = parseFloat(input.value);
-                    if (input.dataset.ectc === 'true') val = convertECTC(val);
-                    values.push(val);
-                }
-            });
-            if (values.some(v => v === '' || isNaN(v))) {
-                resultOutput.innerHTML = '<p class="error">Please enter valid numbers.</p>';
-                resultsSection.classList.remove('hidden');
-                return;
-            }
-            resultOutput.innerHTML = clientData[selectedClient].calculate(...values);
-            resultsSection.classList.remove('hidden');
-        } else {
-            resultsSection.classList.add('hidden');
-        }
-    }
+        const inputs = inputFieldsSection.querySelectorAll('input, select');
+        let values = [];
 
-    clientDropdown.addEventListener('change', function() {
-        const selectedClient = this.value;
-        inputFieldsSection.innerHTML = '';
-        resultsSection.classList.add('hidden');
-        if (!clientData[selectedClient]) return;
-
-        clientData[selectedClient].labels.forEach((label, index) => {
-            const inputGroup = document.createElement('div');
-            inputGroup.classList.add('input-group');
-
-            const labelElement = document.createElement('label');
-            labelElement.textContent = label + ':';
-            inputGroup.appendChild(labelElement);
-
-            const inputWrapper = document.createElement('div');
-            inputWrapper.style.display = 'flex';
-            inputWrapper.style.alignItems = 'center';
-
-            if (label === 'Experience' && selectedClient === 'Capgemini') {
-                const select = document.createElement('select');
-                select.required = true;
-                select.innerHTML = `
-                    <option value="">-- Select Experience --</option>
-                    <option value="12 +">12 +</option>
-                    <option value="10 to 12">10 to 12</option>
-                    <option value="8 to 10">8 to 10</option>
-                    <option value="6 to 8">6 to 8</option>
-                    <option value="4 to 6">4 to 6</option>`;
-                select.addEventListener('change', performCalculation);
-                inputGroup.appendChild(select);
+        inputs.forEach(input => {
+            if (input.tagName.toLowerCase() === 'select') {
+                values.push(input.value);
             } else {
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.step = 'any';
-                input.min = '0';
-                input.pattern = '[0-9]*';
-                input.inputMode = 'decimal';
-                input.required = true;
-
-                if (clientData[selectedClient].defaultValues && clientData[selectedClient].defaultValues[index] !== null) {
-                    input.value = clientData[selectedClient].defaultValues[index];
-                }
-
-                const unitSpan = document.createElement('span');
-                unitSpan.style.marginLeft = '10px';
-                unitSpan.style.fontWeight = 'bold';
-
-                if (label.toLowerCase().includes('ectc')) {
-                    input.dataset.ectc = 'true';
-                    input.addEventListener('input', function () {
-                        unitSpan.textContent = getECTCUnit(this.value);
-                        performCalculation();
-                    });
-                } else {
-                    input.addEventListener('input', performCalculation);
-                }
-
-                input.addEventListener('keydown', function (e) {
-                    if (["e", "E", "+", "-"].includes(e.key) ||
-                        (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")) {
-                        e.preventDefault();
-                    }
-                });
-
-                input.addEventListener('input', function () {
-                    if (parseFloat(input.value) < 0) input.value = '';
-                });
-
-                inputWrapper.appendChild(input);
-                inputWrapper.appendChild(unitSpan);
-                inputGroup.appendChild(inputWrapper);
+                let val = parseFloat(input.value);
+                if (input.dataset.ectc === 'true') val = convertECTC(val);
+                values.push(val);
             }
-
-            inputFieldsSection.appendChild(inputGroup);
         });
-    });
+
+        if (values.some(v => v === '' || isNaN(v))) {
+            resultOutput.innerHTML = '<p class="error">Please enter valid numbers.</p>';
+            resultsSection.classList.remove('hidden');
+            return;
+        }
+
+        const resultHTML = clientData[selectedClient].calculate(...values);
+        resultOutput.innerHTML = resultHTML;
+        resultsSection.classList.remove('hidden');
+    }
 });
