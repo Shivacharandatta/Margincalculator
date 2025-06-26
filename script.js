@@ -64,6 +64,36 @@ const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
 	return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
 }
 },
+	    "Capgemini": {
+    labels: ["ECTC", "Experience"],
+    calculate: function(ectc, experience) {
+        const dailyrate = (((ectc*0.1+ectc))/12)/22;
+        const margin = dailyrate*0.35*22;
+        const billRateWithoutTaxes =  dailyrate + margin;
+	const billRateWithTaxes = billRateWithoutTaxes * 0.18 + billRateWithoutTaxes;
+	const marginColor = margin >= 35000 ? 'green' : 'red';
+
+        let warning = "";
+        const limits = {
+            "4 to 6": 6312,
+            "6 to 8": 8490,
+            "8 to 10": 11820,
+            "10 to 12": 14180,
+            "12 +": 16272
+        };
+
+        if (limits[experience] && billRateWithoutTaxes > limits[experience]) {
+            warning = `<p style="color:red;"><strong>You can't submit the candidate as you are exceeding the given bill rate</strong></p>`;
+        }
+
+        return `
+            <p><strong>Bill Rate with Taxes:</strong> ₹${billRateWithTaxes.toFixed(2)}</p>
+            <p><strong>Bill Rate without Taxes:</strong> ₹${billRateWithoutTaxes.toFixed(2)}</p>
+            <p><strong>Margin:</strong> ₹${margin.toFixed(2)}</p>
+            ${warning}
+        `;
+    }
+},
 
 	"Trane Technologies": {
             labels: ["Bill rate(Hourly)", "ECTC(Annually)"],
@@ -96,7 +126,21 @@ function performCalculation() {
     const selectedClient = clientDropdown.value;
     if (clientData[selectedClient]) {
         const data = clientData[selectedClient];
-        const inputs = inputFieldsSection.querySelectorAll('input[type="number"]');
+        cconst inputs = inputFieldsSection.querySelectorAll('input[type="number"], select');
+let values = [];
+
+inputs.forEach(input => {
+    if (input.tagName.toLowerCase() === 'select') {
+        values.push(input.value);
+    } else {
+        let val = parseFloat(input.value);
+        if (input.dataset.ectc === 'true') {
+            val = convertECTC(val);
+        }
+        values.push(val);
+    }
+});
+
         let values = [];
 
         inputs.forEach(input => {
@@ -122,7 +166,10 @@ function performCalculation() {
             resultHTML = data.calculate(values[0], values[1]);
         } else if (selectedClient === 'HCL') {
             resultHTML = data.calculate(values[0], values[1], values[2]);
-        }else if (selectedClient === 'Lowes') {
+        }else if (selectedClient === 'Capgemini') {
+    resultHTML = data.calculate(values[0], values[1]); // ECTC, Experience
+}
+	else if (selectedClient === 'Lowes') {
                 resultHTML = data.calculate(values[0], values[1], values[2]);
             }
 
@@ -142,73 +189,86 @@ function performCalculation() {
         if (clientData[selectedClient]) {
             const data = clientData[selectedClient];
             data.labels.forEach((label,index) => {
-                const inputGroup = document.createElement('div');
-                inputGroup.classList.add('input-group');
-                
-		const labelElement = document.createElement('label');
-                labelElement.textContent = label + ':';
-                
-		const inputWrapper = document.createElement('div');
-            inputWrapper.style.display = 'flex';
-            inputWrapper.style.alignItems = 'center';
-			
-		const inputElement = document.createElement('input');
-                inputElement.type = 'number';
-                inputElement.step = 'any';
-		inputElement.min = '0';
-		inputElement.pattern = '[0-9]*'; // Hint for numeric input on mobile
-		inputElement.inputMode = 'decimal'; //  Optimizes input keyboard for mobile
-                inputElement.name = label.toLowerCase().replace(/[\s()]/g, ''); // Create a simple name
-                inputElement.required = true;
-                inputElement.addEventListener('input', performCalculation); // Listen for input changes
-// Prevent non-numeric and negative input while typing
-inputElement.addEventListener('keydown', function (e) {
-    // Block "-", "+", "e", "E", any letters
-    if (
-        ["e", "E", "+", "-"].includes(e.key) ||
-        (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")
-    ) {
-        e.preventDefault();
-    }
-});
+           const inputGroup = document.createElement('div');
+inputGroup.classList.add('input-group');
 
-// Also ensure value is never negative manually
-inputElement.addEventListener('input', function () {
-    if (parseFloat(inputElement.value) < 0) {
-        inputElement.value = '';
-    }
-    performCalculation();
-});
-                inputGroup.appendChild(labelElement);
-                inputGroup.appendChild(inputElement);
-                inputFieldsSection.appendChild(inputGroup);
+const labelElement = document.createElement('label');
+labelElement.textContent = label + ':';
 
-		if (data.defaultValues && data.defaultValues[index] !== null) {
-  inputElement.value = data.defaultValues[index];
-}
-		
-		const unitSpan = document.createElement('span');
-            unitSpan.style.marginLeft = '10px';
-            unitSpan.style.fontWeight = 'bold';
-            unitSpan.textContent = '';
+const inputWrapper = document.createElement('div');
+inputWrapper.style.display = 'flex';
+inputWrapper.style.alignItems = 'center';
 
-            // Track ECTC input for dynamic unit rendering
-            if (label.toLowerCase().includes('ectc')) {
-                inputElement.dataset.ectc = 'true';
-                inputElement.addEventListener('input', function () {
-                    unitSpan.textContent = getECTCUnit(this.value);
-                    performCalculation();
-                });
-            } else {
-                inputElement.addEventListener('input', performCalculation);
-            }
+if (label === "Experience" && selectedClient === "Capgemini") {
+    // Create dropdown instead of input
+    const selectElement = document.createElement('select');
+    selectElement.name = 'experience';
+    selectElement.required = true;
+    selectElement.style.padding = '10px';
+    selectElement.style.borderRadius = '5px';
+    selectElement.style.border = '1px solid #ccc';
+    selectElement.innerHTML = `
+        <option value="">-- Select Experience --</option>
+        <option value="12 +">12 +</option>
+        <option value="10 to 12">10 to 12</option>
+        <option value="8 to 10">8 to 10</option>
+        <option value="6 to 8">6 to 8</option>
+        <option value="4 to 6">4 to 6</option>
+    `;
+    selectElement.addEventListener('change', performCalculation);
+    inputGroup.appendChild(labelElement);
+    inputGroup.appendChild(selectElement);
+    inputFieldsSection.appendChild(inputGroup);
+} else {
+    const inputElement = document.createElement('input');
+    inputElement.type = 'number';
+    inputElement.step = 'any';
+    inputElement.min = '0';
+    inputElement.pattern = '[0-9]*';
+    inputElement.inputMode = 'decimal';
+    inputElement.name = label.toLowerCase().replace(/[\s()]/g, '');
+    inputElement.required = true;
 
-            inputWrapper.appendChild(inputElement);
-            inputWrapper.appendChild(unitSpan);
-            inputGroup.appendChild(labelElement);
-            inputGroup.appendChild(inputWrapper);
-            inputFieldsSection.appendChild(inputGroup);
-           });
+    // Prevent non-numeric and negative input
+    inputElement.addEventListener('keydown', function (e) {
+        if (
+            ["e", "E", "+", "-"].includes(e.key) ||
+            (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")
+        ) {
+            e.preventDefault();
         }
+    });
+
+    inputElement.addEventListener('input', function () {
+        if (parseFloat(inputElement.value) < 0) {
+            inputElement.value = '';
+        }
+        performCalculation();
+    });
+
+    // Default values
+    if (data.defaultValues && data.defaultValues[index] !== null) {
+        inputElement.value = data.defaultValues[index];
+    }
+
+    const unitSpan = document.createElement('span');
+    unitSpan.style.marginLeft = '10px';
+    unitSpan.style.fontWeight = 'bold';
+    unitSpan.textContent = '';
+
+    if (label.toLowerCase().includes('ectc')) {
+        inputElement.dataset.ectc = 'true';
+        inputElement.addEventListener('input', function () {
+            unitSpan.textContent = getECTCUnit(this.value);
+            performCalculation();
+        });
+    }
+
+    inputWrapper.appendChild(inputElement);
+    inputWrapper.appendChild(unitSpan);
+    inputGroup.appendChild(labelElement);
+    inputGroup.appendChild(inputWrapper);
+    inputFieldsSection.appendChild(inputGroup);
+}
     });
 });
