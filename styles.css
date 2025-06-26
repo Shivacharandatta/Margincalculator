@@ -119,3 +119,27 @@ button:hover {
 .hidden {
     display: none;
 }
+
+/* Header styling */
+.tsit-header {
+    background-color: #f0f6ff; /* Soft blue background */
+    padding: 20px;
+    text-align: center;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Centered and clean logo */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.logo-container img {
+    max-height: 80px;
+    width: auto;
+    object-fit: contain;
+}
