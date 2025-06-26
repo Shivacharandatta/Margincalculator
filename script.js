@@ -90,8 +90,7 @@ const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
             <p><strong>Bill Rate with Taxes:</strong> ₹${billRateWithTaxes.toFixed(2)}</p>
             <p><strong>Bill Rate without Taxes:</strong> ₹${billRateWithoutTaxes.toFixed(2)}</p>
             <p><strong>Margin:</strong> ₹${margin.toFixed(2)}</p>
-            ${warning}
-        `;
+            ${warning}`;
     }
 },
 
@@ -135,23 +134,13 @@ inputs.forEach(input => {
     } else {
         let val = parseFloat(input.value);
         if (input.dataset.ectc === 'true') {
-            val = convertECTC(val);
+            val = convertECTC(val); // convert ECTC for backend use
         }
         values.push(val);
     }
 });
 
-        let values = [];
-
-        inputs.forEach(input => {
-            let val = parseFloat(input.value);
-            if (input.dataset.ectc === 'true') {
-                val = convertECTC(val); // convert ECTC for backend use
-            }
-            values.push(val);
-        });
-
-        if (values.some(isNaN)) {
+            if (values.some(isNaN)) {
             resultOutput.innerHTML = '<p class="error">Please enter valid numbers.</p>';
             resultsSection.classList.remove('hidden');
             return;
