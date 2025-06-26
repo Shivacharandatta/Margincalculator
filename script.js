@@ -155,7 +155,7 @@ function performCalculation() {
 		const inputElement = document.createElement('input');
                 inputElement.type = 'number';
                 inputElement.step = 'any';
-			inputElement.min = '0';
+		inputElement.min = '0';
 		inputElement.pattern = '[0-9]*'; // Hint for numeric input on mobile
 		inputElement.inputMode = 'decimal'; //  Optimizes input keyboard for mobile
                 inputElement.name = label.toLowerCase().replace(/[\s()]/g, ''); // Create a simple name
@@ -179,9 +179,6 @@ inputElement.addEventListener('input', function () {
     }
     performCalculation();
 });
-                inputElement.name = label.toLowerCase().replace(/[\s()]/g, ''); // Create a simple name
-                inputElement.required = true;
-                inputElement.addEventListener('input', performCalculation); // Listen for input changes
                 inputGroup.appendChild(labelElement);
                 inputGroup.appendChild(inputElement);
                 inputFieldsSection.appendChild(inputGroup);
