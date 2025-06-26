@@ -43,15 +43,15 @@ const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
     }
 },
         "Diageo": {
-            labels: ["Bill rate(daily)"],
-            calculate: function(billRate) {
-                const candidateOffer = (billRate / 1.25) * 227;
-		const hourlyrate = billRate / 1.25;
-                const margin = (billRate - (billRate / 1.25)) * 18.91667;
+            labels: ["Bill rate(daily)", "Markup %",],
+            calculate: function(billRate, markUp) {
+                const candidateOffer = (billRate / (1+markUp/100)) * 227;
+		const hourlyrate = billRate / (1+markUp/100);
+                const margin = (billRate - (billRate / (1+markUp/100))) * 18.91667;
 		const marginColor = margin >= 35000 ? 'green' : 'red';
 
-                return `<p><strong>Candidate can be offered:</strong> ${candidateOffer.toFixed(2)}</p>
-			<p><strong>Candidate daily rate:</strong> ${hourlyrate.toFixed(2)}</p>
+                return `<p><strong>Candidate can be offered:</strong> ₹${candidateOffer.toFixed(2)}</p>
+			<p><strong>Candidate daily rate:</strong> ₹${hourlyrate.toFixed(2)}</p>
                         <p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         },
