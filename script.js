@@ -10,90 +10,94 @@ document.addEventListener('DOMContentLoaded', function () {
             calculate: function (billRate, ectc) {
                 const margin = (billRate - (billRate * 0.05)) - (ectc / 12);
                 const marginColor = margin >= 35000 ? 'green' : 'red';
-                return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+                return `<p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         },
-    	"HCL": {
-    labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
-	defaultValues: [null, 18, null],
-    calculate: function(ectc, markup, clientBillRate) {
-        const billRate = (ectc + (ectc * markup) / 100) / 12;
-        const monthlyMargin = billRate - (ectc / 12);
-        const annualMargin = monthlyMargin * 12;
+        "HCL": {
+            labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
+            defaultValues: [null, 18, null],
+            calculate: function (ectc, markup, clientBillRate) {
+                const billRate = (ectc + (ectc * markup) / 100) / 12;
+                const monthlyMargin = billRate - (ectc / 12);
+                const annualMargin = monthlyMargin * 12;
+                const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
 
-        let comparisonMessage = "";
-        if (clientBillRate && billRate > clientBillRate) {
-            const exceededAmount = billRate - clientBillRate;
-            comparisonMessage = `<p style="color:red;"><strong>Warning:</strong> You are exceeding the Bill Rate from client by ₹${exceededAmount.toFixed(2)}</p>`;
-        }
+                let comparisonMessage = "";
+                if (clientBillRate && billRate > clientBillRate) {
+                    const exceededAmount = billRate - clientBillRate;
+                    comparisonMessage = `<p style="color:red;"><strong>Warning:</strong> You are exceeding the Bill Rate from client by ₹${exceededAmount.toFixed(2)}</p>`;
+                }
 
-        return `
-            <p><strong>Billrate (Monthly):</strong> ₹${billRate.toFixed(2)}</p>
-            <p><strong>Monthly Margin:</strong> ₹${monthlyMargin.toFixed(2)}</p>
-            <p><strong>Annual Margin:</strong> ₹${annualMargin.toFixed(2)}</p>
-            ${comparisonMessage}
-        `;
-    }
-},
+                return `
+                    <p><strong>📉Billrate (Monthly):</strong> ₹${billRate.toFixed(2)}</p>
+                    <p><strong>📊Monthly Margin:</strong> <span style="color:${monthlyMarginColor};">₹${monthlyMargin.toFixed(2)}</span></p>
+                    <p><strong>📊Annual Margin:</strong> ₹${annualMargin.toFixed(2)}</p>
+                    ${comparisonMessage}
+                `;
+            }
+        },
         "Diageo": {
-            labels: ["Bill rate(daily)"],
-            calculate: function(billRate) {
-                const candidateOffer = (billRate / 1.25) * 227;
-		const hourlyrate = billRate / 1.25;
-                const margin = (billRate - (billRate / 1.25)) * 18.91667;
-                return `<p><strong>Candidate can be offered:</strong> ${candidateOffer.toFixed(2)}</p>
-			<p><strong>Candidate daily rate:</strong> ${hourlyrate.toFixed(2)}</p>
-                        <p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
+            labels: ["Bill rate(daily)", "Markup %"],
+		defaultValues: [null, 25],
+            calculate: function (billRate, markUp) {
+                const candidateOffer = (billRate / (1 + markUp / 100)) * 227;
+                const hourlyrate = billRate / (1 + markUp / 100);
+                const margin = (billRate - (billRate / (1 + markUp / 100))) * 18.91667;
+                const marginColor = margin >= 35000 ? 'green' : 'red';
+                return `<p><strong>💼Candidate can be offered:</strong> ₹${candidateOffer.toFixed(2)}</p>
+                    <p><strong>💼Candidate daily rate:</strong> ₹${hourlyrate.toFixed(2)}</p>
+                    <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         },
-	"Lowes": {
-	    labels: ["Bill rate(Hourly)", "MSP %", "ECTC(Annually)"],
-	defaultValues: [null, 3, null],
-	calculate: function(billRate, msp, ectc) {
-	const margin = ((billRate * 160) * (1 - (msp / 100))) - (ectc / 12);
-	const marginColor = margin >= 35000 ? 'green' : 'red';
-	return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
-}
-},
-"Capg": {
-    labels: ["ECTC", "Experience"],
-    calculate: function (ectc, experience) {
-        const dailyrate = (((ectc * 0.1 + ectc)) / 12) / 22;
-        const margin = dailyrate * 0.35 * 22;
-        const billRateWithoutTaxes = dailyrate + margin;
-        const billRateWithTaxes = billRateWithoutTaxes * 1.18;
-        const marginColor = margin >= 35000 ? 'green' : 'red';
+        "Lowes": {
+            labels: ["Bill rate(Hourly)", "MSP %", "ECTC(Annually)"],
+            defaultValues: [null, 3, null],
+            calculate: function (billRate, msp, ectc) {
+                const margin = ((billRate * 160) * (1 - (msp / 100))) - (ectc / 12);
+                const marginColor = margin >= 35000 ? 'green' : 'red';
+                return `<p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+            }
+        },
+        "Capg": {
+            labels: ["ECTC", "Experience"],
+            calculate: function (ectc, experience) {
+                const dailyrate = (((ectc * 0.1 + ectc)) / 12) / 22;
+                const margin = dailyrate * 0.35;
+                const billRateWithoutTaxes = dailyrate + margin;
+                const billRateWithTaxes = billRateWithoutTaxes * 1.18;
+                const marginColor = margin >= 35000 ? 'green' : 'red';
 
-        const limits = {
-            "4 to 6": 6312,
-            "6 to 8": 8490,
-            "8 to 10": 11820,
-            "10 to 12": 14180,
-            "12 +": 16272
-        };
+                const limits = {
+                    "4 to 6": 6312,
+                    "6 to 8": 8490,
+                    "8 to 10": 11820,
+                    "10 to 12": 14180,
+                    "12 +": 16272
+                };
 
-        let warning = "";
-        if (limits[experience] && billRateWithoutTaxes > limits[experience]) {
-            warning = `<p style="color:red;font-weight:bold;">🚫 You can't submit the candidate as you are exceeding the given bill rate</p>`;
-        }
+                let warning = "";
+                if (limits[experience] && billRateWithoutTaxes > limits[experience]) {
+                    warning = `<p style="color:red;font-weight:bold;">🚫 You can't submit the candidate as you are exceeding the given bill rate</p>`;
+                }
 
-        return `
-            <p><strong>💼 Bill Rate with Taxes:</strong> ₹${billRateWithTaxes.toFixed(2)}</p>
-            <p><strong>📉 Bill Rate without Taxes:</strong> ₹${billRateWithoutTaxes.toFixed(2)}</p>
-            <p><strong>📊 Margin:</strong> <span style="color:${marginColor}; font-weight: bold;">₹${margin.toFixed(2)}</span></p>
-            ${warning}
-        `;
-    }
-},
-
-	"Trane Technologies": {
+                return `
+                    <p><strong>💼 Bill Rate with Taxes:</strong> ₹${billRateWithTaxes.toFixed(2)}</p>
+                    <p><strong>📉 Bill Rate without Taxes:</strong> ₹${billRateWithoutTaxes.toFixed(2)}</p>
+                    <p><strong>📊 Margin:</strong> <span style="color:${marginColor}; font-weight: bold;">₹${margin.toFixed(2)}</span></p>
+                    ${warning}
+                `;
+            }
+        },
+        "Trane Technologies": {
             labels: ["Bill rate(Hourly)", "ECTC(Annually)"],
-            calculate: function(billRate, ectc) {
-                const margin = ((billRate*160*12) - (ectc ))/ 12;
-                return `<p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
+            calculate: function (billRate, ectc) {
+                const margin = ((billRate * 160 * 12) - (ectc)) / 12;
+                const marginColor = margin >= 35000 ? 'green' : 'red';
+                return `<p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         }
     };
+
     function convertECTC(value) {
         value = parseFloat(value);
         if (isNaN(value)) return 0;
@@ -112,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return 'Monthly';
     }
 
-    
     function performCalculation() {
         const selectedClient = clientDropdown.value;
         if (!clientData[selectedClient]) return;
@@ -202,7 +205,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     <option value="4 to 6">4 to 6</option>`;
 
                 select.addEventListener('change', performCalculation);
-
                 inputGroup.appendChild(select);
                 inputFieldsSection.appendChild(inputGroup);
                 return;
@@ -215,6 +217,11 @@ document.addEventListener('DOMContentLoaded', function () {
             input.required = true;
             input.pattern = '[0-9]*';
             input.inputMode = 'decimal';
+
+            // Set default value
+            if (Array.isArray(data.defaultValues) && data.defaultValues[index] !== null) {
+                input.value = data.defaultValues[index];
+            }
 
             input.addEventListener('keydown', function (e) {
                 if (["e", "E", "+", "-"].includes(e.key) || (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")) {
@@ -237,6 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (label.toLowerCase().includes('ectc')) {
                 input.dataset.ectc = 'true';
+                unitSpan.textContent = getECTCUnit(input.value);
                 input.addEventListener('input', function () {
                     unitSpan.textContent = getECTCUnit(this.value);
                     performCalculation();
@@ -248,5 +256,8 @@ document.addEventListener('DOMContentLoaded', function () {
             inputGroup.appendChild(inputWrapper);
             inputFieldsSection.appendChild(inputGroup);
         });
+
+        // performCalculation(); 
+// Trigger calculation after rendering inputs
     });
 });
