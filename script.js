@@ -244,12 +244,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-              inputWrapper.appendChild(inputElement);
-    inputWrapper.appendChild(unitSpan);
-
-    inputGroup.appendChild(labelElement);
-    inputGroup.appendChild(inputWrapper);
-    inputFieldsSection.appendChild(inputGroup);
+              inputWrapper.appendChild(input);
+            inputWrapper.appendChild(unitSpan);
+            inputGroup.appendChild(inputWrapper);
+            inputFieldsSection.appendChild(inputGroup);
         });
     });
 });
