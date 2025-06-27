@@ -4,6 +4,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const resultsSection = document.getElementById('results');
     const resultOutput = document.getElementById('result-output');
 
+let capgLegend = document.getElementById('capg-legend');
+    if (!capgLegend) {
+        capgLegend = document.createElement('div');
+        capgLegend.id = 'capg-legend';
+        capgLegend.style.marginTop = '20px';
+        capgLegend.style.display = 'none';
+        inputFieldsSection.after(capgLegend); // ✅ place it right after input section
+    }
+
     const clientData = {
         "Sony": {
             labels: ["Bill rate(Monthly)", "ECTC(Annually)"],
@@ -115,6 +124,63 @@ document.addEventListener('DOMContentLoaded', function () {
         if (value > 3500 && value < 20000) return 'Per day';
         return 'Monthly';
     }
+function showCapgLegend(show = true) {
+    const legendContainer = document.getElementById('capg-legend');
+    if (!legendContainer) return;
+
+    if (!show) {
+        legendContainer.style.display = 'none';
+        legendContainer.innerHTML = '';
+        return;
+    }
+
+    legendContainer.innerHTML = `
+        <h3 style="font-weight:bold;margin-bottom:10px;">📘 Capgemini CTC Offering Guidelines</h3>
+        <table style="border-collapse: collapse; width: 100%; text-align: center; font-size: 14px;">
+            <thead style="background-color: #f0f0f0;">
+                <tr>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Experience</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Grade</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Per Day Rate (Excl. Taxes)</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">CTC You Can Offer</th>
+                </tr>
+            </thead>
+            <tbody>
+    <tr>
+        <td style="border:1px solid #ccc;padding:8px;">12 +</td>
+        <td style="border:1px solid #ccc;padding:8px;">D2</td>
+        <td style="border:1px solid #ccc;padding:8px;">16,272</td>
+        <td style="border:1px solid #ccc;padding:8px;">28.5 LPA</td>
+    </tr>
+    <tr>
+        <td style="border:1px solid #ccc;padding:8px;">10 to 12</td>
+        <td style="border:1px solid #ccc;padding:8px;">D1</td>
+        <td style="border:1px solid #ccc;padding:8px;">14,180</td>
+        <td style="border:1px solid #ccc;padding:8px;">26 LPA</td>
+    </tr>
+    <tr>
+        <td style="border:1px solid #ccc;padding:8px;">8 to 10</td>
+        <td style="border:1px solid #ccc;padding:8px;">C2</td>
+        <td style="border:1px solid #ccc;padding:8px;">11,820</td>
+        <td style="border:1px solid #ccc;padding:8px;">21.5 LPA</td>
+    </tr>
+    <tr>
+        <td style="border:1px solid #ccc;padding:8px;">6 to 8</td>
+        <td style="border:1px solid #ccc;padding:8px;">C1</td>
+        <td style="border:1px solid #ccc;padding:8px;">8,490</td>
+        <td style="border:1px solid #ccc;padding:8px;">15 LPA</td>
+    </tr>
+    <tr>
+        <td style="border:1px solid #ccc;padding:8px;">4 to 6</td>
+        <td style="border:1px solid #ccc;padding:8px;">B2</td>
+        <td style="border:1px solid #ccc;padding:8px;">6,312</td>
+        <td style="border:1px solid #ccc;padding:8px;">12 LPA</td>
+    </tr>
+</tbody>
+        </table>
+    `;
+    legendContainer.style.display = 'block';
+}
 
     function performCalculation() {
         const selectedClient = clientDropdown.value;
@@ -167,6 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     clientDropdown.addEventListener('change', function () {
         const selectedClient = this.value;
+	showCapgLegend(selectedClient === "Capg");
         inputFieldsSection.innerHTML = '';
         resultsSection.classList.add('hidden');
         if (!clientData[selectedClient]) return;
