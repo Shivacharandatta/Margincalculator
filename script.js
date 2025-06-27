@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
             calculate: function (billRate, ectc) {
                 const margin = (billRate - (billRate * 0.05)) - (ectc / 12);
                 const marginColor = margin >= 35000 ? 'green' : 'red';
-                return `<p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+                return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
             }
         },
     	"HCL": {
@@ -28,23 +28,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         return `
-            <p><strong>💼Billrate (Monthly):</strong> ₹${billRate.toFixed(2)}</p>
-            <p><strong>💼Monthly Margin:</strong> ₹${monthlyMargin.toFixed(2)}</p>
-            <p><strong>📊Annual Margin:</strong> ₹${annualMargin.toFixed(2)}</p>
+            <p><strong>Billrate (Monthly):</strong> ₹${billRate.toFixed(2)}</p>
+            <p><strong>Monthly Margin:</strong> ₹${monthlyMargin.toFixed(2)}</p>
+            <p><strong>Annual Margin:</strong> ₹${annualMargin.toFixed(2)}</p>
             ${comparisonMessage}
         `;
     }
 },
         "Diageo": {
-            labels: ["Bill rate(daily)", "Markup %"],
-            calculate: function(billRate, markUp) {
-                const candidateOffer = (billRate / (1+markUp/100) * 227;
-		const hourlyrate = billRate / (1+markUp/100);
-                const margin = (billRate - (billRate / (1+markUp/100))) * 18.91667;
-		    const marginColor = margin >= 35000 ? 'green' : 'red';
-                return `<p><strong>💼Candidate can be offered:</strong> ${candidateOffer.toFixed(2)}</p>
-			<p><strong>💼Candidate daily rate:</strong> ${hourlyrate.toFixed(2)}</p>
-                        <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+            labels: ["Bill rate(daily)"],
+            calculate: function(billRate) {
+                const candidateOffer = (billRate / 1.25) * 227;
+		const hourlyrate = billRate / 1.25;
+                const margin = (billRate - (billRate / 1.25)) * 18.91667;
+                return `<p><strong>Candidate can be offered:</strong> ${candidateOffer.toFixed(2)}</p>
+			<p><strong>Candidate daily rate:</strong> ${hourlyrate.toFixed(2)}</p>
+                        <p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
             }
         },
 	"Lowes": {
@@ -53,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	calculate: function(billRate, msp, ectc) {
 	const margin = ((billRate * 160) * (1 - (msp / 100))) - (ectc / 12);
 	const marginColor = margin >= 35000 ? 'green' : 'red';
-	return `<p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+	return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
 }
 },
 "Capg": {
@@ -91,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ["Bill rate(Hourly)", "ECTC(Annually)"],
             calculate: function(billRate, ectc) {
                 const margin = ((billRate*160*12) - (ectc ))/ 12;
-                return `<p><strong>📊Margin:</strong> <span style="color:${marginColor}; font-weight: bold;">₹${margin.toFixed(2)}</span></p>`;
+                return `<p><strong>Margin:</strong> ${margin.toFixed(2)}</p>`;
             }
         }
     };
@@ -244,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-              inputWrapper.appendChild(input);
+            inputWrapper.appendChild(input);
             inputWrapper.appendChild(unitSpan);
             inputGroup.appendChild(inputWrapper);
             inputFieldsSection.appendChild(inputGroup);
