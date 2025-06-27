@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             calculate: function(billRate, ectc) {
                 const margin = (billRate - (billRate * 0.05)) - (ectc / 12);
 		const marginColor = margin >= 35000 ? 'green' : 'red';
-                return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+                return <p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
             }
         },
 	"HCL": {
@@ -27,10 +27,10 @@ let comparisonMessage = "";
 const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
   if (clientBillRate && clientBillRate > billRate) {
     const bufferAmount = clientBillRate - billRate;
-    bufferMessage = `<p style="color:green;"><strong>Buffer Amount (Monthly):</strong> ₹${bufferAmount.toFixed(2)}</p>`;
+    bufferMessage = <p style="color:green;"><strong>Buffer Amount (Monthly):</strong> ₹${bufferAmount.toFixed(2)}</p>;
   }else if (clientBillRate && billRate > clientBillRate) {
             const exceededAmount = billRate - clientBillRate;
-            comparisonMessage = `<p style="color:red;"><strong>Warning:</strong> You are exceeding the Bill Rate from client by ₹${exceededAmount.toFixed(2)}</p>`;
+            comparisonMessage = <p style="color:red;"><strong>Warning:</strong> You are exceeding the Bill Rate from client by ₹${exceededAmount.toFixed(2)}</p>;
         }
 
         return `
@@ -61,7 +61,7 @@ const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
 	calculate: function(billRate, msp, ectc) {
 	const margin = ((billRate * 160) * (1 - (msp / 100))) - (ectc / 12);
 	const marginColor = margin >= 35000 ? 'green' : 'red';
-	return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+	return <p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
 }
 },
 
@@ -70,7 +70,7 @@ const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
             calculate: function(billRate, ectc) {
                 const margin = ((billRate*160*12) - (ectc ))/ 12;
 		const marginColor = margin >= 35000 ? 'green' : 'red';
-                return `<p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+                return <p><strong>Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
             }
         }
     };
@@ -93,139 +93,121 @@ if (value > 3500 && value < 20000) return 'Per day';
     return 'Monthly';
 }
 function performCalculation() {
-        const selectedClient = clientDropdown.value;
-        if (!clientData[selectedClient]) return;
-
-        const inputs = inputFieldsSection.querySelectorAll('input, select');
+    const selectedClient = clientDropdown.value;
+    if (clientData[selectedClient]) {
+        const data = clientData[selectedClient];
+        const inputs = inputFieldsSection.querySelectorAll('input[type="number"]');
         let values = [];
 
-        let ectcValid = false;
-        let experienceValid = false;
-
         inputs.forEach(input => {
-            if (input.tagName.toLowerCase() === 'select') {
-                const val = input.value;
-                if (val !== "") {
-                    values.push(val);
-                    experienceValid = true;
-                } else {
-                    values.push("");
-                }
-            } else {
-                let val = parseFloat(input.value);
-                if (input.dataset.ectc === 'true') val = convertECTC(val);
-                if (!isNaN(val) && val > 0) {
-                    values.push(val);
-                    ectcValid = true;
-                } else {
-                    values.push(NaN);
-                }
+            let val = parseFloat(input.value);
+            if (input.dataset.ectc === 'true') {
+                val = convertECTC(val); // convert ECTC for backend use
             }
+            values.push(val);
         });
 
-        if (selectedClient === "Capg") {
-            if (!ectcValid) {
-                resultOutput.innerHTML = '<p style="color:red;font-weight:bold;">Please enter a valid ECTC.</p>';
-                resultsSection.classList.remove('hidden');
-                return;
-            }
-            if (!experienceValid) {
-                resultOutput.innerHTML = '<p style="color:red;font-weight:bold;">Please select a valid Experience range.</p>';
-                resultsSection.classList.remove('hidden');
-                return;
-            }
+        if (values.some(isNaN)) {
+            resultOutput.innerHTML = '<p class="error">Please enter valid numbers.</p>';
+            resultsSection.classList.remove('hidden');
+            return;
         }
 
-        const resultHTML = clientData[selectedClient].calculate(...values);
-        resultOutput.innerHTML = resultHTML;
-        resultsSection.classList.remove('hidden');
-    }
-
-    clientDropdown.addEventListener('change', function () {
-        const selectedClient = this.value;
-        inputFieldsSection.innerHTML = '';
-        resultsSection.classList.add('hidden');
-        if (!clientData[selectedClient]) return;
-
-        const data = clientData[selectedClient];
-        data.labels.forEach((label, index) => {
-            const inputGroup = document.createElement('div');
-            inputGroup.classList.add('input-group');
-
-            const labelElement = document.createElement('label');
-            labelElement.textContent = label + ':';
-            inputGroup.appendChild(labelElement);
-
-            if (label === 'Experience' && selectedClient === 'Capg') {
-                const select = document.createElement('select');
-                select.required = true;
-                select.style.padding = '10px 14px';
-                select.style.width = '100%';
-                select.style.border = '1px solid #aaa';
-                select.style.borderRadius = '12px';
-                select.style.backgroundColor = '#fff';
-                select.style.boxShadow = 'inset 0 1px 3px rgba(0, 0, 0, 0.1)';
-                select.style.fontSize = '15px';
-                select.style.fontWeight = '500';
-                select.style.color = '#333';
-                select.style.outline = 'none';
-                select.style.transition = 'all 0.2s ease-in-out';
-                select.style.cursor = 'pointer';
-
-                select.innerHTML = `
-                    <option value="" disabled selected>-- Select Experience --</option>
-                    <option value="12 +">12 +</option>
-                    <option value="10 to 12">10 to 12</option>
-                    <option value="8 to 10">8 to 10</option>
-                    <option value="6 to 8">6 to 8</option>
-                    <option value="4 to 6">4 to 6</option>`;
-
-                select.addEventListener('change', performCalculation);
-
-                inputGroup.appendChild(select);
-                inputFieldsSection.appendChild(inputGroup);
-                return;
+        let resultHTML = '';
+        if (selectedClient === 'Sony') {
+            resultHTML = data.calculate(values[0], values[1]);
+        } else if (selectedClient === 'Diageo') {
+            resultHTML = data.calculate(values[0], values[1]);
+        } else if (selectedClient === 'Trane Technologies') {
+            resultHTML = data.calculate(values[0], values[1]);
+        } else if (selectedClient === 'HCL') {
+            resultHTML = data.calculate(values[0], values[1], values[2]);
+        }else if (selectedClient === 'Lowes') {
+                resultHTML = data.calculate(values[0], values[1], values[2]);
             }
 
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.step = 'any';
-            input.min = '0';
-            input.required = true;
-            input.pattern = '[0-9]*';
-            input.inputMode = 'decimal';
+        resultOutput.innerHTML = resultHTML;
+        resultsSection.classList.remove('hidden');
+    } else {
+        resultsSection.classList.add('hidden');
+    }
+}
 
-            input.addEventListener('keydown', function (e) {
-                if (["e", "E", "+", "-"].includes(e.key) || (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")) {
-                    e.preventDefault();
-                }
-            });
+    clientDropdown.addEventListener('change', function() {
+        const selectedClient = this.value;
+        inputFieldsSection.innerHTML = ''; // Clear previous input fields
+        resultsSection.classList.add('hidden'); // Hide previous results
 
-            input.addEventListener('input', function () {
-                if (parseFloat(input.value) < 0) input.value = '';
-                performCalculation();
-            });
-
-            const inputWrapper = document.createElement('div');
+        if (clientData[selectedClient]) {
+            const data = clientData[selectedClient];
+            data.labels.forEach((label,index) => {
+                const inputGroup = document.createElement('div');
+                inputGroup.classList.add('input-group');
+                
+		const labelElement = document.createElement('label');
+                labelElement.textContent = label + ':';
+                
+		const inputWrapper = document.createElement('div');
             inputWrapper.style.display = 'flex';
             inputWrapper.style.alignItems = 'center';
+			
+		const inputElement = document.createElement('input');
+                inputElement.type = 'number';
+                inputElement.step = 'any';
+		inputElement.min = '0';
+		inputElement.pattern = '[0-9]*'; // Hint for numeric input on mobile
+		inputElement.inputMode = 'decimal'; //  Optimizes input keyboard for mobile
+                inputElement.name = label.toLowerCase().replace(/[\s()]/g, ''); // Create a simple name
+                inputElement.required = true;
+                inputElement.addEventListener('input', performCalculation); // Listen for input changes
+// Prevent non-numeric and negative input while typing
+inputElement.addEventListener('keydown', function (e) {
+    // Block "-", "+", "e", "E", any letters
+    if (
+        ["e", "E", "+", "-"].includes(e.key) ||
+        (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")
+    ) {
+        e.preventDefault();
+    }
+});
 
-            const unitSpan = document.createElement('span');
+// Also ensure value is never negative manually
+inputElement.addEventListener('input', function () {
+    if (parseFloat(inputElement.value) < 0) {
+        inputElement.value = '';
+    }
+    performCalculation();
+});
+                inputGroup.appendChild(labelElement);
+                inputGroup.appendChild(inputElement);
+                inputFieldsSection.appendChild(inputGroup);
+
+		if (data.defaultValues && data.defaultValues[index] !== null) {
+  inputElement.value = data.defaultValues[index];
+}
+		
+		const unitSpan = document.createElement('span');
             unitSpan.style.marginLeft = '10px';
             unitSpan.style.fontWeight = 'bold';
+            unitSpan.textContent = '';
 
+            // Track ECTC input for dynamic unit rendering
             if (label.toLowerCase().includes('ectc')) {
-                input.dataset.ectc = 'true';
-                input.addEventListener('input', function () {
+                inputElement.dataset.ectc = 'true';
+                inputElement.addEventListener('input', function () {
                     unitSpan.textContent = getECTCUnit(this.value);
                     performCalculation();
                 });
+            } else {
+                inputElement.addEventListener('input', performCalculation);
             }
 
-            inputWrapper.appendChild(input);
+            inputWrapper.appendChild(inputElement);
             inputWrapper.appendChild(unitSpan);
+            inputGroup.appendChild(labelElement);
             inputGroup.appendChild(inputWrapper);
             inputFieldsSection.appendChild(inputGroup);
-        });
+           });
+        }
     });
 });
