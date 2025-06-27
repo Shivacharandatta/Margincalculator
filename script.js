@@ -175,7 +175,7 @@ function showCapgLegend(show = true) {
         <td style="border:1px solid #ccc;padding:8px;">4 to 6</td>
         <td style="border:1px solid #ccc;padding:8px;">B2</td>
         <td style="border:1px solid #ccc;padding:8px;">6,312</td>
-        <td style="border:1px solid #ccc;padding:8px;">12 LPA</td>
+        <td style="border:1px solid #ccc;padding:8px;">11 LPA</td>
     </tr>
 </tbody>
         </table>
