@@ -140,67 +140,74 @@ function performCalculation() {
 
         if (clientData[selectedClient]) {
             const data = clientData[selectedClient];
-            data.labels.forEach((label, index) => {
-    const inputGroup = document.createElement('div');
-    inputGroup.classList.add('input-group');
-
-    const labelElement = document.createElement('label');
-    labelElement.textContent = label + ':';
-
-    const inputWrapper = document.createElement('div');
-    inputWrapper.style.display = 'flex';
-    inputWrapper.style.alignItems = 'center';
-
-    const inputElement = document.createElement('input');
-    inputElement.type = 'number';
-    inputElement.step = 'any';
-    inputElement.min = '0';
-    inputElement.pattern = '[0-9]*';
-    inputElement.inputMode = 'decimal';
-    inputElement.name = label.toLowerCase().replace(/[\s()]/g, '');
-    inputElement.required = true;
-
-    // Block non-numeric input
-    inputElement.addEventListener('keydown', function (e) {
-        if (["e", "E", "+", "-"].includes(e.key) ||
-            (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")) {
-            e.preventDefault();
-        }
-    });
-
-    inputElement.addEventListener('input', function () {
-        if (parseFloat(inputElement.value) < 0) {
-            inputElement.value = '';
-        }
-        performCalculation();
-    });
-
-    // ✅ Set default value
-    if (data.defaultValues && data.defaultValues[index] !== null) {
-        inputElement.value = data.defaultValues[index];
+            data.labels.forEach((label,index) => {
+                const inputGroup = document.createElement('div');
+                inputGroup.classList.add('input-group');
+                
+		const labelElement = document.createElement('label');
+                labelElement.textContent = label + ':';
+                
+		const inputWrapper = document.createElement('div');
+            inputWrapper.style.display = 'flex';
+            inputWrapper.style.alignItems = 'center';
+			
+		const inputElement = document.createElement('input');
+                inputElement.type = 'number';
+                inputElement.step = 'any';
+		inputElement.min = '0';
+		inputElement.pattern = '[0-9]*'; // Hint for numeric input on mobile
+		inputElement.inputMode = 'decimal'; //  Optimizes input keyboard for mobile
+                inputElement.name = label.toLowerCase().replace(/[\s()]/g, ''); // Create a simple name
+                inputElement.required = true;
+                inputElement.addEventListener('input', performCalculation); // Listen for input changes
+// Prevent non-numeric and negative input while typing
+inputElement.addEventListener('keydown', function (e) {
+    // Block "-", "+", "e", "E", any letters
+    if (
+        ["e", "E", "+", "-"].includes(e.key) ||
+        (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")
+    ) {
+        e.preventDefault();
     }
-
-    const unitSpan = document.createElement('span');
-    unitSpan.style.marginLeft = '10px';
-    unitSpan.style.fontWeight = 'bold';
-    unitSpan.textContent = '';
-
-    if (label.toLowerCase().includes('ectc')) {
-        inputElement.dataset.ectc = 'true';
-        inputElement.addEventListener('input', function () {
-            unitSpan.textContent = getECTCUnit(this.value);
-            performCalculation();
-        });
-    }
-
-    inputWrapper.appendChild(inputElement);
-    inputWrapper.appendChild(unitSpan);
-
-    inputGroup.appendChild(labelElement);
-    inputGroup.appendChild(inputWrapper);
-    inputFieldsSection.appendChild(inputGroup);
 });
 
+// Also ensure value is never negative manually
+inputElement.addEventListener('input', function () {
+    if (parseFloat(inputElement.value) < 0) {
+        inputElement.value = '';
+    }
+    performCalculation();
+});
+                inputGroup.appendChild(labelElement);
+                inputGroup.appendChild(inputElement);
+                inputFieldsSection.appendChild(inputGroup);
+
+		if (data.defaultValues && data.defaultValues[index] !== null) {
+  inputElement.value = data.defaultValues[index];
+}
+		
+		const unitSpan = document.createElement('span');
+            unitSpan.style.marginLeft = '10px';
+            unitSpan.style.fontWeight = 'bold';
+            unitSpan.textContent = '';
+
+            // Track ECTC input for dynamic unit rendering
+            if (label.toLowerCase().includes('ectc')) {
+                inputElement.dataset.ectc = 'true';
+                inputElement.addEventListener('input', function () {
+                    unitSpan.textContent = getECTCUnit(this.value);
+                    performCalculation();
+                });
+            } else {
+                inputElement.addEventListener('input', performCalculation);
+            }
+
+            inputWrapper.appendChild(inputElement);
+            inputWrapper.appendChild(unitSpan);
+            inputGroup.appendChild(labelElement);
+            inputGroup.appendChild(inputWrapper);
+            inputFieldsSection.appendChild(inputGroup);
+           });
         }
     });
 });
