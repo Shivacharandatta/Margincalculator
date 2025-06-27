@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const candidateOffer = (billRate / (1+markUp/100) * 227;
 		const hourlyrate = billRate / (1+markUp/100);
                 const margin = (billRate - (billRate / (1+markUp/100))) * 18.91667;
+		    const marginColor = margin >= 35000 ? 'green' : 'red';
                 return `<p><strong>💼Candidate can be offered:</strong> ${candidateOffer.toFixed(2)}</p>
 			<p><strong>💼Candidate daily rate:</strong> ${hourlyrate.toFixed(2)}</p>
                         <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
@@ -243,10 +244,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            inputWrapper.appendChild(input);
-            inputWrapper.appendChild(unitSpan);
-            inputGroup.appendChild(inputWrapper);
-            inputFieldsSection.appendChild(inputGroup);
+              inputWrapper.appendChild(inputElement);
+    inputWrapper.appendChild(unitSpan);
+
+    inputGroup.appendChild(labelElement);
+    inputGroup.appendChild(inputWrapper);
+    inputFieldsSection.appendChild(inputGroup);
         });
     });
 });
