@@ -72,7 +72,7 @@ let capgLegend = document.getElementById('capg-legend');
             calculate: function (ectc, experience) {
                 const dailyrate = (((ectc * 0.1 + ectc)) / 12) / 22;
                 const dailymargin = dailyrate * 0.35;
-		    const margin = dailymargin * 22;
+		const margin = dailymargin * 22;
                 const billRateWithoutTaxes = dailyrate + dailymargin;
                 const billRateWithTaxes = billRateWithoutTaxes * 1.18;
                 const marginColor = margin >= 35000 ? 'green' : 'red';
