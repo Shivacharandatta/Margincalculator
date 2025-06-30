@@ -45,6 +45,14 @@ let capgLegend = document.getElementById('capg-legend');
                 `;
             }
         },
+	"Infosys": {
+		labels: ["Bill rate(daily)", "ECTC"],
+		calculate: function (billRate, ectc) {
+			const margin = (billRate * 20) - (ectc/12);
+			const marginColor = margin >= 35000 ? 'green' : 'red';
+			return `<p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>`;
+            }
+        },
         "Diageo": {
             labels: ["Bill rate(daily)", "Markup %"],
 		defaultValues: [null, 25],
