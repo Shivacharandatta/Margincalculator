@@ -15,106 +15,130 @@ let capgLegend = document.getElementById('capg-legend');
 
     const clientData = {
         "Sony": {
-            labels: ["Bill rate(Monthly)", "ECTC(Annually)"],
-            calculate: function (billRate, ectc) {
-                const margin = (billRate - (billRate * 0.05)) - (ectc / 12);
-                const marginColor = margin >= 35000 ? 'green' : 'red';
-                return <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
-            }
-        },
-        "HCL": {
-            labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
-            defaultValues: [null, 18, null],
-            calculate: function (ectc, markup, clientBillRate) {
-                const billRate = (ectc + (ectc * markup) / 100) / 12;
-                const monthlyMargin = billRate - (ectc / 12);
-                const annualMargin = monthlyMargin * 12;
-                const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
+  labels: ["Bill rate(Monthly)", "ECTC(Annually)"],
+  calculate: function (billRate, ectc) {
+    const margin = (billRate - (billRate * 0.05)) - (ectc / 12);
+    const marginColor = margin >= 35000 ? 'green' : 'red';
+    return [
+      { label: "📉 Adjusted Bill Rate (5% deduction)", value: `₹${(billRate - billRate * 0.05).toFixed(2)}` },
+      { label: "📊 Monthly Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
+    ];
+  }
+},
+"HCL": {
+  labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
+  defaultValues: [null, 18, null],
+  calculate: function (ectc, markup, clientBillRate) {
+    const billRate = (ectc + (ectc * markup) / 100) / 12;
+    const monthlyMargin = billRate - (ectc / 12);
+    const annualMargin = monthlyMargin * 12;
+    const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
 
-                let comparisonMessage = "";
-                if (clientBillRate && billRate > clientBillRate) {
-                    const exceededAmount = billRate - clientBillRate;
-                    comparisonMessage = <p style="color:red;"><strong>Warning:</strong> You are exceeding the Bill Rate from client by ₹${exceededAmount.toFixed(2)}</p>;
-                }
+    let rows = [
+      { label: "💵Billrate (Monthly)", value: `₹${billRate.toFixed(2)}` },
+      { label: "📊Monthly Margin", value: `₹${monthlyMargin.toFixed(2)}`, color: monthlyMarginColor },
+      { label: "📊Annual Margin", value: `₹${annualMargin.toFixed(2)}` }
+    ];
 
-                return 
-                    <p><strong>📉Billrate (Monthly):</strong> ₹${billRate.toFixed(2)}</p>
-                    <p><strong>📊Monthly Margin:</strong> <span style="color:${monthlyMarginColor};">₹${monthlyMargin.toFixed(2)}</span></p>
-                    <p><strong>📊Annual Margin:</strong> ₹${annualMargin.toFixed(2)}</p>
-                    ${comparisonMessage}
-                ;
-            }
-        },
+    if (clientBillRate && billRate > clientBillRate) {
+      const exceededAmount = billRate - clientBillRate;
+      rows.push({
+        label: "⚠️Warning",
+        value: `Exceeds Client Rate by ₹${exceededAmount.toFixed(2)}`,
+        color: 'red'
+      });
+    }
+
+    return rows;
+  }
+},
         "Diageo": {
-            labels: ["Bill rate(daily)", "Markup %"],
-		defaultValues: [null, 25],
-            calculate: function (billRate, markUp) {
-                const candidateOffer = (billRate / (1 + markUp / 100)) * 227;
-                const hourlyrate = billRate / (1 + markUp / 100);
-                const margin = (billRate - (billRate / (1 + markUp / 100))) * 18.91667;
-                const marginColor = margin >= 35000 ? 'green' : 'red';
-                return <p><strong>💼Candidate can be offered:</strong> ₹${candidateOffer.toFixed(2)}</p>
-                    <p><strong>💼Candidate daily rate:</strong> ₹${hourlyrate.toFixed(2)}</p>
-                    <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
-            }
-        },
+    labels: ["Bill rate(daily)", "Markup %"],
+    defaultValues: [null, 25],
+    calculate: function (billRate, markUp) {
+        const candidateOffer = (billRate / (1 + markUp / 100)) * 227;
+        const hourlyRate = billRate / (1 + markUp / 100);
+        const margin = (billRate - (billRate / (1 + markUp / 100))) * 18.91667;
+        const marginColor = margin >= 35000 ? 'green' : 'red';
+
+        return [
+            { label: "💼 Candidate can be offered", value: `₹${candidateOffer.toFixed(2)}` },
+            { label: "💵 Candidate daily rate", value: `₹${hourlyRate.toFixed(2)}` },
+            { label: "📊 Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
+        ];
+    }
+},
         "Lowes": {
-            labels: ["Bill rate(Hourly)", "MSP %", "ECTC(Annually)"],
-            defaultValues: [null, 3, null],
-            calculate: function (billRate, msp, ectc) {
-                const margin = ((billRate * 160) * (1 - (msp / 100))) - (ectc / 12);
-                const marginColor = margin >= 35000 ? 'green' : 'red';
-                return <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
-            }
-        },
+  labels: ["Bill rate(Hourly)", "MSP %", "ECTC(Annually)"],
+  defaultValues: [null, 3, null],
+  calculate: function (billRate, msp, ectc) {
+    const margin = ((billRate * 160) * (1 - (msp / 100))) - (ectc / 12);
+    const marginColor = margin >= 35000 ? 'green' : 'red';
+    return [
+      { label: "💵 Adjusted Monthly Bill Rate (after MSP)", value: `₹${((billRate * 160) * (1 - msp / 100)).toFixed(2)}` },
+      { label: "📊 Monthly Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
+    ];
+  }
+},
 	"Infosys": {
-		labels: ["Bill rate(daily)", "ECTC"],
-		calculate: function (billRate, ectc) {
-			const margin = (billRate * 20) - (ectc/12);
-			const marginColor = margin >= 35000 ? 'green' : 'red';
-			return <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
-            }
-        },
+  labels: ["Bill rate(daily)", "ECTC"],
+  calculate: function (billRate, ectc) {
+    const margin = (billRate * 20) - (ectc / 12);
+    const marginColor = margin >= 35000 ? 'green' : 'red';
+    return [
+      { label: "💵 Monthly Bill Rate", value: `₹${(billRate * 20).toFixed(2)}` },
+      { label: "📊 Monthly Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
+    ];
+  }
+},
+"Capg": {
+  labels: ["ECTC", "Experience"],
+  calculate: function (ectc, experience) {
+    const dailyrate = (((ectc * 0.1 + ectc)) / 12) / 22;
+    const margin = dailyrate * 0.35 * 22;
+    const billRateWithoutTaxes = dailyrate + (margin/22);
+    const billRateWithTaxes = billRateWithoutTaxes * 1.18;
+    const marginColor = margin >= 35000 ? 'green' : 'red';
 
-        "Capg": {
-            labels: ["ECTC", "Experience"],
-            calculate: function (ectc, experience) {
-                const dailyrate = (((ectc * 0.1 + ectc)) / 12) / 22;
-                const margin = dailyrate * 0.35;
-                const billRateWithoutTaxes = dailyrate + margin;
-                const billRateWithTaxes = billRateWithoutTaxes * 1.18;
-                const marginColor = margin >= 35000 ? 'green' : 'red';
-
-                const limits = {
-                    "4 to 6": 6312,
-                    "6 to 8": 8490,
-                    "8 to 10": 11820,
-                    "10 to 12": 14180,
-                    "12 +": 16272
-                };
-
-                let warning = "";
-                if (limits[experience] && billRateWithoutTaxes > limits[experience]) {
-                    warning = <p style="color:red;font-weight:bold;">🚫 You can't submit the candidate as you are exceeding the given bill rate</p>;
-                }
-
-                return 
-                    <p><strong>💼 Bill Rate with Taxes:</strong> ₹${billRateWithTaxes.toFixed(2)}</p>
-                    <p><strong>📉 Bill Rate without Taxes:</strong> ₹${billRateWithoutTaxes.toFixed(2)}</p>
-                    <p><strong>📊 Margin:</strong> <span style="color:${marginColor}; font-weight: bold;">₹${margin.toFixed(2)}</span></p>
-                    ${warning}
-                ;
-            }
-        },
-        "Trane Technologies": {
-            labels: ["Bill rate(Hourly)", "ECTC(Annually)"],
-            calculate: function (billRate, ectc) {
-                const margin = ((billRate * 160 * 12) - (ectc)) / 12;
-                const marginColor = margin >= 35000 ? 'green' : 'red';
-                return <p><strong>📊Margin:</strong> <span style="color:${marginColor};">₹${margin.toFixed(2)}</span></p>;
-            }
-        }
+    const limits = {
+      "4 to 6": 6312,
+      "6 to 8": 8490,
+      "8 to 10": 11820,
+      "10 to 12": 14180,
+      "12 +": 16272
     };
+
+    const rows = [
+      { label: "💵 Bill Rate (without taxes)", value: `₹${billRateWithoutTaxes.toFixed(2)}` },
+      { label: "💵 Bill Rate (with 18% taxes)", value: `₹${billRateWithTaxes.toFixed(2)}` },
+      { label: "📊 Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
+    ];
+
+    if (limits[experience] && billRateWithoutTaxes > limits[experience]) {
+      rows.push({
+        label: "🚫 Warning",
+        value: `You can't submit the candidate as you are exceeding the allowed rate for "${experience}"`,
+        color: "red"
+      });
+    }
+
+    return rows;
+  }
+},
+     "Trane Technologies": {
+  labels: ["Bill rate(Hourly)", "ECTC(Annually)"],
+  calculate: function (billRate, ectc) {
+    const margin = ((billRate * 160 * 12) - ectc) / 12;
+    const monthlyRate = billRate * 160;
+    const marginColor = margin >= 35000 ? 'green' : 'red';
+
+    return [
+      { label: "💵 Monthly Bill Rate", value: `₹${monthlyRate.toFixed(2)}` },
+      { label: "📊 Monthly Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
+    ];
+  }
+}
+};
 
     function convertECTC(value) {
         value = parseFloat(value);
@@ -143,7 +167,7 @@ function showCapgLegend(show = true) {
         return;
     }
 
-    legendContainer.innerHTML = 
+    legendContainer.innerHTML = `
         <h3 style="font-weight:bold;margin-bottom:10px;">📘 Capgemini CTC Offering Guidelines</h3>
         <table style="border-collapse: collapse; width: 100%; text-align: center; font-size: 14px;">
             <thead style="background-color: #f0f0f0;">
@@ -183,11 +207,11 @@ function showCapgLegend(show = true) {
         <td style="border:1px solid #ccc;padding:8px;">4 to 6</td>
         <td style="border:1px solid #ccc;padding:8px;">B2</td>
         <td style="border:1px solid #ccc;padding:8px;">6,312</td>
-        <td style="border:1px solid #ccc;padding:8px;">12 LPA</td>
+        <td style="border:1px solid #ccc;padding:8px;">11 LPA</td>
     </tr>
 </tbody>
         </table>
-    ;
+    `;
     legendContainer.style.display = 'block';
 }
 
@@ -235,9 +259,47 @@ function showCapgLegend(show = true) {
             }
         }
 
-        const resultHTML = clientData[selectedClient].calculate(...values);
-        resultOutput.innerHTML = resultHTML;
-        resultsSection.classList.remove('hidden');
+        const resultRows = clientData[selectedClient].calculate(...values);
+
+// Table wrapper
+let resultHTML = `
+  <div style="margin-top: 20px;">
+    <table style="
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 15px;
+    ">
+      <thead>
+        <tr style="background-color: #3f51b5; color: #fff;">
+          <th style="text-align: left; padding: 12px 16px;">📍Metric</th>
+          <th style="text-align: left; padding: 12px 16px;">💰 Value</th>
+        </tr>
+      </thead>
+      <tbody>
+`;
+
+resultRows.forEach((row, index) => {
+  const bgColor = index % 2 === 0 ? '#f9f9f9' : '#ffffff';
+  resultHTML += `
+    <tr style="background-color: ${bgColor};">
+      <td style="padding: 12px 16px; font-weight: 500;">${row.label}</td>
+      <td style="padding: 12px 16px; font-weight: bold; color: ${row.color || '#333'};">${row.value}</td>
+    </tr>
+  `;
+});
+
+resultHTML += `
+      </tbody>
+    </table>
+  </div>
+`;
+resultOutput.innerHTML = resultHTML;
+resultsSection.classList.remove('hidden');
     }
 
     clientDropdown.addEventListener('change', function () {
@@ -272,13 +334,13 @@ function showCapgLegend(show = true) {
                 select.style.transition = 'all 0.2s ease-in-out';
                 select.style.cursor = 'pointer';
 
-                select.innerHTML = 
+                select.innerHTML = `
                     <option value="" disabled selected>-- Select Experience --</option>
                     <option value="12 +">12 +</option>
                     <option value="10 to 12">10 to 12</option>
                     <option value="8 to 10">8 to 10</option>
                     <option value="6 to 8">6 to 8</option>
-                    <option value="4 to 6">4 to 6</option>;
+                    <option value="4 to 6">4 to 6</option>`;
 
                 select.addEventListener('change', performCalculation);
                 inputGroup.appendChild(select);
