@@ -362,10 +362,25 @@ resultsSection.classList.remove('hidden');
             }
 
             input.addEventListener('keydown', function (e) {
-                if (["e", "E", "+", "-"].includes(e.key) || (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")) {
-                    e.preventDefault();
-                }
-            });
+    // Allow navigation keys and shortcuts like Ctrl+V (paste), Ctrl+C (copy), etc.
+    if (
+        e.ctrlKey || e.metaKey || // Allow Ctrl/Cmd shortcuts
+        ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab", "Enter"].includes(e.key)
+    ) {
+        return; // allow default behavior
+    }
+
+    // Block non-numeric input
+    if (["e", "E", "+", "-"].includes(e.key) || (e.key.length === 1 && isNaN(Number(e.key)) && e.key !== ".")) {
+        e.preventDefault();
+    }
+});
+input.addEventListener('paste', function (e) {
+    const pasted = e.clipboardData.getData('text');
+    if (isNaN(pasted)) {
+        e.preventDefault(); // cancel paste if it's not a number
+    }
+});
 
             input.addEventListener('input', function () {
                 if (parseFloat(input.value) < 0) input.value = '';
