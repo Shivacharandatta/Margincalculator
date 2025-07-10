@@ -26,13 +26,13 @@ let capgLegend = document.getElementById('capg-legend');
   }
 },
 "HCL": {
-  labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
+   labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
   defaultValues: [null, 18, null],
   calculate: function (ectc, markup, clientBillRate) {
     const billRate = (ectc + (ectc * markup) / 100) / 12;
     const monthlyMargin = billRate - (ectc / 12);
     const annualMargin = monthlyMargin * 12;
-    coonst monthlyCTC = ectce/12;
+    const monthlyCTC = ectc/12;
     const monthlyMarginColor = monthlyMargin >= 35000 ? 'green' : 'red';
 
     let rows = [
@@ -40,14 +40,16 @@ let capgLegend = document.getElementById('capg-legend');
       { label: "📊Monthly Margin", value: `₹${monthlyMargin.toFixed(2)}`, color: monthlyMarginColor },
       { label: "📊Annual Margin", value: `₹${annualMargin.toFixed(2)}` }
     ];
-     if (clientBillRate && clientBillRate > monthlyCTC) {
+
+    if (clientBillRate && clientBillRate > monthlyCTC) {
       const bufferAmount = clientBillRate - monthlyCTC;
       rows.push({
         label: "📦Buffer Amount",
         value: `₹${bufferAmount.toFixed(2)}`,
 	color: 'green'
       });
-    }	  
+    }
+
     if (clientBillRate && billRate > clientBillRate) {
       const exceededAmount = billRate - clientBillRate;
       rows.push({
