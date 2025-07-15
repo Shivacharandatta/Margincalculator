@@ -41,8 +41,8 @@ let capgLegend = document.getElementById('capg-legend');
       { label: "📊Annual Margin", value: `₹${annualMargin.toFixed(2)}` }
     ];
 
-    if (clientBillRate && clientBillRate > monthlyCTC) {
-      const bufferAmount = clientBillRate - monthlyCTC;
+   if (clientBillRate && clientBillRate > billRate) {
+      const bufferAmount = clientBillRate - billRate;
       rows.push({
         label: "📦Buffer Amount",
         value: `₹${bufferAmount.toFixed(2)}`,
