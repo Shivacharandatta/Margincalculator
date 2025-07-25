@@ -26,7 +26,7 @@ let capgLegend = document.getElementById('capg-legend');
   }
 },
 "HCL": {
-   labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
+  labels: ["ECTC (Annually)", "Markup %", "Bill Rate Given by Client (Monthly)"],
   defaultValues: [null, 18, null],
   calculate: function (ectc, markup, clientBillRate) {
     const billRate = (ectc + (ectc * markup) / 100) / 12;
@@ -41,7 +41,7 @@ let capgLegend = document.getElementById('capg-legend');
       { label: "📊Annual Margin", value: `₹${annualMargin.toFixed(2)}` }
     ];
 
-   if (clientBillRate && clientBillRate > billRate) {
+    if (clientBillRate && clientBillRate > billRate) {
       const bufferAmount = clientBillRate - billRate;
       rows.push({
         label: "📦Buffer Amount",
@@ -135,7 +135,7 @@ let capgLegend = document.getElementById('capg-legend');
     return rows;
   }
 },
- "Trane Technologies": {
+     "Trane Technologies": {
   labels: ["Bill rate(Hourly)", "ECTC(Annually)"],
   calculate: function (billRate, ectc) {
     const margin = ((billRate * 160 * 12) - ectc) / 12;
