@@ -92,6 +92,7 @@ let capgLegend = document.getElementById('capg-legend');
 },
 	"Infosys": {
   labels: ["Bill rate(daily)", "ECTC"],
+  defaultValues: [null, null],
   calculate: function (billRate, ectc) {
     const margin = (billRate * 20) - (ectc / 12);
     const marginColor = margin >= 35000 ? 'green' : 'red';
@@ -103,6 +104,7 @@ let capgLegend = document.getElementById('capg-legend');
 },
 "Impiger": {
   labels: ["Bill rate(Monthly)", "ECTC"],
+  defaultValues: [null, null],
   calculate: function (billRate, ectc) {
     const margin = (billRate) - (ectc / 12);
     const marginColor = margin >= 35000 ? 'green' : 'red';
