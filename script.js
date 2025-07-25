@@ -101,6 +101,17 @@ let capgLegend = document.getElementById('capg-legend');
     ];
   }
 },
+"Impiger": {
+  labels: ["Bill rate(Monthly)", "ECTC"],
+  calculate: function (billRate, ectc) {
+    const margin = (billRate) - (ectc / 12);
+    const marginColor = margin >= 35000 ? 'green' : 'red';
+    return [
+      { label: "💵 Monthly Bill Rate", value: `₹${billRate.toFixed(2)}` },
+      { label: "📊 Monthly Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
+    ];
+  }
+},
 "Capg": {
   labels: ["ECTC", "Experience"],
   calculate: function (ectc, experience) {
