@@ -158,7 +158,7 @@ let capgLegend = document.getElementById('capg-legend');
       { label: "💵 Monthly Bill Rate", value: `₹${(billRate * 20).toFixed(2)}` },
       { label: "📊 Monthly Margin", value: `₹${margin.toFixed(2)}`, color: marginColor }
     ];
-  }
+  
 }
 };
 
